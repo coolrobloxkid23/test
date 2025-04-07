@@ -89,12 +89,22 @@ local function findBackdoors()
     end
     scan(game)
     if #suspiciousScripts > 0 then
-        warn("Suspicious scripts found:")
+        -- Improved feedback to user
+        local backdoorMessage = "Suspicious scripts found:\n"
         for _, scriptName in ipairs(suspiciousScripts) do
-            warn(scriptName)
+            backdoorMessage = backdoorMessage .. scriptName .. "\n"
         end
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Backdoor Finder",
+            Text = backdoorMessage,
+            Duration = 5
+        })
     else
-        print("No suspicious scripts found.")
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Backdoor Finder",
+            Text = "No suspicious scripts found.",
+            Duration = 5
+        })
     end
 end
 
