@@ -51,18 +51,18 @@ local function createButton(name, callback)
     return button
 end
 
--- Play Audio Function
-local function playAudio()
-    local soundId = "rbxassetid://INSERT_AUDIO_ID_HERE" -- Replace with your Audio ID
+-- Play Scary Audio Function
+local function playScaryAudio()
+    local soundId = "rbxassetid://9043345732" -- Scary Audio ID
     local sound = Instance.new("Sound")
     sound.SoundId = soundId
     sound.Parent = game.Workspace
     sound:Play()
 end
 
--- Change Skybox Function
+-- Change Skybox to Scary One
 local function changeSkybox()
-    local skyboxId = "rbxassetid://INSERT_SKYBOX_ID_HERE" -- Replace with your Skybox ID
+    local skyboxId = "rbxassetid://10798732439" -- Scary Skybox ID
     local lighting = game:GetService("Lighting")
     local sky = lighting:FindFirstChildOfClass("Sky") or Instance.new("Sky", lighting)
     sky.SkyboxBk = skyboxId
@@ -89,22 +89,12 @@ local function findBackdoors()
     end
     scan(game)
     if #suspiciousScripts > 0 then
-        -- Improved feedback to user
-        local backdoorMessage = "Suspicious scripts found:\n"
+        warn("Suspicious scripts found:")
         for _, scriptName in ipairs(suspiciousScripts) do
-            backdoorMessage = backdoorMessage .. scriptName .. "\n"
+            warn(scriptName)
         end
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Backdoor Finder",
-            Text = backdoorMessage,
-            Duration = 5
-        })
     else
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Backdoor Finder",
-            Text = "No suspicious scripts found.",
-            Duration = 5
-        })
+        print("No suspicious scripts found.")
     end
 end
 
@@ -114,7 +104,7 @@ local function destroyGUI()
 end
 
 -- Create Buttons
-createButton("Play Audio", playAudio)
+createButton("Play Scary Audio", playScaryAudio)
 createButton("Change Skybox", changeSkybox)
 createButton("Find Backdoors", findBackdoors)
 createButton("Destroy GUI", destroyGUI)
